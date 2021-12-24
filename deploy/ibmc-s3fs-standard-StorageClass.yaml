@@ -1,8 +1,8 @@
 ---
 kind: StorageClass
-apiVersion: storage.k8s.io/v1beta1
+apiVersion: storage.k8s.io/v1
 metadata:
-  name: ibmc-s3fs-standard
+  name: cluster-s3fs-storage
 provisioner: ibm.io/ibmc-s3fs
 parameters:
   ibm.io/chunk-size-mb: "10"
@@ -14,5 +14,10 @@ parameters:
   ibm.io/curl-debug: "false"
   ibm.io/kernel-cache: "true"
   ibm.io/s3fs-fuse-retry-count: "5"
-  ibm.io/iam-endpoint: "https://iam.cloud.ibm.com"
-
+  ibm.io/iam-endpoint: "http://172.19.81.211"
+  ibm.io/object-store-endpoint: "http://172.19.81.211"
+  ibm.io/auto-create-bucket: "true"
+  ibm.io/auto-delete-bucket: "false"
+  ibm.io/secret-name: "storage-key"
+  ibm.io/secret-namespace: "kube-system"
+  ibm.io/object-store-storage-class: "us-stroage"

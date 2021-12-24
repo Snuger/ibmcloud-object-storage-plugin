@@ -14,6 +14,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net"
+	"os"
+	"path"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/IBM/ibmcloud-object-storage-plugin/driver"
 	"github.com/IBM/ibmcloud-object-storage-plugin/ibm-provider/provider"
 	"github.com/IBM/ibmcloud-object-storage-plugin/utils/backend"
@@ -23,17 +31,10 @@ import (
 	"github.com/IBM/ibmcloud-object-storage-plugin/utils/uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"io/ioutil"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"net"
-	"os"
-	"path"
 	"sigs.k8s.io/sig-storage-lib-external-provisioner/v6/controller"
-	"strconv"
-	"strings"
-	"time"
 )
 
 // PVC annotations
@@ -439,11 +440,12 @@ func (p *IBMS3fsProvisioner) Provision(ctx context.Context, options controller.P
 			return nil, controller.ProvisioningFinished, fmt.Errorf(pvcName+":"+clusterID+":bucket cannot be set when auto-delete is enabled, got: %s", pvc.Bucket)
 		}
 
-		id, err := p.UUIDGenerator.New()
-		if err != nil {
-			return nil, controller.ProvisioningFinished, fmt.Errorf(pvcName+":"+clusterID+":cannot create UUID for bucket name: %v", err)
-		}
-		pvc.Bucket = autoBucketNamePrefix + id
+		// id, err := p.UUIDGenerator.New()
+		// if err != nil {
+		// 	return nil, controller.ProvisioningFinished, fmt.Errorf(pvcName+":"+clusterID+":cannot create UUID for bucket name: %v", err)
+		// }
+		//pvc.Bucket = autoBucketNamePrefix + id
+		pvc.Bucket = strings.Join([]string{pvcNamespace, options.PVName}, "-")
 	}
 
 	if pvc.ValidateBucket == "no" && pvc.AutoCreateBucket == "false" {
@@ -538,11 +540,12 @@ func (p *IBMS3fsProvisioner) Provision(ctx context.Context, options controller.P
 	if pvc.AutoCreateBucket == "true" {
 		var deleteBucket = true
 		if pvc.AutoDeleteBucket != "true" && pvc.Bucket == "" { //this handles the cases where AutoDeleteBucket is set false and bucket is not specified.
-			id, err := p.UUIDGenerator.New()
-			if err != nil {
-				return nil, controller.ProvisioningFinished, fmt.Errorf(pvcName+":"+clusterID+":cannot create UUID for bucket name: %v", err)
-			}
-			pvc.Bucket = autoBucketNamePrefix + id
+			// id, err := p.UUIDGenerator.New()
+			// if err != nil {
+			// 	return nil, controller.ProvisioningFinished, fmt.Errorf(pvcName+":"+clusterID+":cannot create UUID for bucket name: %v", err)
+			// }
+			//pvc.Bucket = autoBucketNamePrefix + id
+			pvc.Bucket = strings.Join([]string{pvcNamespace, options.PVName}, "-")
 		}
 
 		if creds.APIKey != "" && creds.ServiceInstanceID == "" {

@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ibmcloud-object-storage-plugin
@@ -9,20 +9,23 @@ spec:
   strategy:
     type: RollingUpdate
   replicas: 1
+  selector:
+    matchLabels:
+        app: ibmcloud-object-storage-plugin
   template:
     metadata:
       labels:
         app: ibmcloud-object-storage-plugin
     spec:
       tolerations:
-      - operator: "Exists"
+        - operator: "Exists"
       serviceAccountName: ibmcloud-object-storage-plugin
       containers:
         - name: ibmcloud-object-storage-plugin-container
-          image: ibmcloud-object-storage-plugin:latest
-          imagePullPolicy: IfNotPresent
+          image: 172.19.30.186:8000/s3-stroage/ibmcloud-object-storage-plugin:beta-v1
+          imagePullPolicy: Always
           args:
             - "-provisioner=ibm.io/ibmc-s3fs"
           env:
-          - name: DEBUG_TRACE
-            value: 'false'
+            - name: DEBUG_TRACE
+              value: "false"

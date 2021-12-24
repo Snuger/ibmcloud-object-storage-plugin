@@ -1,15 +1,14 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: s3fs-test-pvc
+  name: mediinfo-lyra-pingtai-cunchu-claim
+  namespace: mcrp-production
   annotations:
-    volume.beta.kubernetes.io/storage-class: "ibmc-s3fs-standard"
-    ibm.io/region: "us-standard"
-    ibm.io/secret-name: "test-secret"
+    volume.beta.kubernetes.io/storage-class: "cluster-s3fs-storage"
     ibm.io/stat-cache-expire-seconds: "" # stat-cache-expire time in seconds; default is no expire.
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 500Mi # fictitious value
+      storage: 50Gi # fictitious value
